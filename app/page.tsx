@@ -66,6 +66,37 @@ function Ornament({ variant, className = "" }: { variant: "stripe" | "star" | "s
   );
 }
 
+function Stockings() {
+  const cuffs = ["#a5352d", "#d9a847", "#174b41"];
+  return (
+    <div className="stockings" aria-hidden="true">
+      {cuffs.map((color, i) => (
+        <div className="stocking-rig" key={i} style={{ "--delay": `${i * -0.7}s` } as React.CSSProperties}>
+          <span className="stocking-string" />
+          <span className="stocking-pin" />
+          <div className="stocking-body" style={{ background: color }}>
+            <span className="stocking-cuff" />
+            <span className="stocking-mark">✦</span>
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function MiniTree() {
+  return (
+    <div className="mini-tree" aria-hidden="true">
+      <span className="mini-tree-top" />
+      <div className="mini-tree-tier t1" />
+      <div className="mini-tree-tier t2" />
+      <div className="mini-tree-tier t3" />
+      <span className="mini-tree-trunk" />
+      <span className="light l1" /><span className="light l2" /><span className="light l3" /><span className="light l4" /><span className="light l5" />
+    </div>
+  );
+}
+
 export default function Home() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [activeDoor, setActiveDoor] = useState<number | null>(null);
@@ -88,6 +119,8 @@ export default function Home() {
           <a href="#story" onClick={closeMenu}>The evening</a>
           <a href="#programme" onClick={closeMenu}>Programme</a>
           <a href="#discover" onClick={closeMenu}>Little secrets</a>
+          <a href="#visit" onClick={closeMenu}>Visit us</a>
+          <a href="/register" className="nav-register" onClick={closeMenu}>Register my room <span>✦</span></a>
           <button className="nav-rsvp" onClick={() => { setRsvpOpen(true); closeMenu(); }}>Save my seat <span>↗</span></button>
         </nav>
       </header>
@@ -109,6 +142,8 @@ export default function Home() {
         </div>
         <Ornament variant="stripe" className="ornament-left" />
         <Ornament variant="star" className="ornament-right" />
+        <Stockings />
+        <MiniTree />
         <div className="hero-glow" />
         <div className="hero-content">
           <p className="eyebrow"><span /> An invitation to wonder <span /></p>
@@ -176,6 +211,60 @@ export default function Home() {
         <div className="tiny-instruction"><span>↖</span> Go on, open one</div>
       </section>
 
+      <section className="visit-section section" id="visit">
+        <div className="section-heading centered dark">
+          <p className="section-kicker">Find us</p>
+          <h2>When, where<br /><em>&amp; who to ask.</em></h2>
+          <p>Everything you need to get your dorm there — and your decorations seen.</p>
+        </div>
+        <div className="visit-grid">
+          <div className="visit-card">
+            <span className="visit-icon">✦</span>
+            <p className="section-kicker">Date &amp; time</p>
+            <h3>Fri, 18 Dec 2026</h3>
+            <p>Doors open 6:30 PM · Ends 11:30 PM</p>
+          </div>
+          <div className="visit-card">
+            <span className="visit-icon">❋</span>
+            <p className="section-kicker">Venue</p>
+            <h3>The Glasshouse</h3>
+            <p>Block C Residences, Student Village<br />Singapore</p>
+          </div>
+          <div className="visit-card">
+            <span className="visit-icon">☕</span>
+            <p className="section-kicker">Questions?</p>
+            <h3>@NorthstarCommittee</h3>
+            <p>Message us on Telegram anytime</p>
+          </div>
+        </div>
+        <div className="map-wrap">
+          <iframe
+            title="Map to The Glasshouse"
+            loading="lazy"
+            referrerPolicy="no-referrer-when-downgrade"
+            src="https://www.google.com/maps?q=Student+Village+Residences+Singapore&output=embed"
+          />
+          <a
+            className="text-link map-link"
+            href="https://www.google.com/maps/search/?api=1&query=Student+Village+Residences+Singapore"
+            target="_blank"
+            rel="noreferrer"
+          >
+            Get directions <span>↗</span>
+          </a>
+        </div>
+      </section>
+
+      <section className="register-banner section">
+        <Ornament variant="sprig" className="banner-ornament" />
+        <div className="banner-content">
+          <p className="section-kicker light">Finished decorating?</p>
+          <h2>Hang your stocking.</h2>
+          <p>Tell us your room number so our elves know exactly where to drop your gift.</p>
+          <a className="cream-button" href="/register">Register my room <span>↗</span></a>
+        </div>
+      </section>
+
       <section className="rsvp-banner section">
         <Ornament variant="sprig" className="banner-ornament" />
         <div className="banner-content">
@@ -190,7 +279,7 @@ export default function Home() {
       <footer>
         <a className="brand footer-brand" href="#top"><span className="brand-mark"><Star /></span><span><b>NORTHSTAR</b><small>NOCTURNE</small></span></a>
         <p>Made for warm hearts & cold nights.</p>
-        <div><a href="#programme">Programme</a><a href="#discover">Secrets</a><button onClick={() => setRsvpOpen(true)}>RSVP</button></div>
+        <div><a href="#visit">Visit</a><a href="/register">Register</a><a href="https://t.me/NorthstarCommittee" target="_blank" rel="noreferrer">Telegram</a><button onClick={() => setRsvpOpen(true)}>RSVP</button></div>
         <span>© 2026 Northstar Society</span>
       </footer>
 
