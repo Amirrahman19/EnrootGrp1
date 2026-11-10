@@ -9,6 +9,8 @@ function Star({ className = "" }: { className?: string }) {
 export default function Register() {
   const [submitted, setSubmitted] = useState(false);
   const [room, setRoom] = useState("");
+  const [sending, setSending] = useState(false);
+  const [error, setError] = useState("");
 
   return (
     <main className="register-page">
@@ -32,26 +34,44 @@ export default function Register() {
                 drop something sweet inside before the big night.
               </p>
               <form
-                onSubmit={(e) => {
+                onSubmit={async (e) => {
                   e.preventDefault();
-                  setSubmitted(true);
+                  const form = e.currentTarget;
+                  const data = Object.fromEntries(new FormData(form)) as Record<string, string>;
+                  setSending(true);
+                  setError("");
+                  try {
+                    const res = await fetch("/api/submit", {
+                      method: "POST",
+                      headers: { "Content-Type": "application/json" },
+                      body: JSON.stringify({ kind: "register", fields: data }),
+                    });
+                    const json = await res.json().catch(() => ({}));
+                    if (!res.ok || !json.ok) throw new Error(json.error || "Something went wrong");
+                    setSubmitted(true);
+                  } catch (err) {
+                    setError(err instanceof Error ? err.message : "Something went wrong");
+                  } finally {
+                    setSending(false);
+                  }
                 }}
               >
                 <label>
                   Your name
-                  <input required placeholder="Clara Evergreen" />
+                  <input name="name" required placeholder="Clara Evergreen" />
                 </label>
                 <label>
                   Email address
-                  <input required type="email" placeholder="clara@example.com" />
+                  <input name="email" required type="email" placeholder="clara@example.com" />
                 </label>
                 <label>
                   Block / Building
-                  <input required placeholder="Block C" />
+                  <input name="block" required placeholder="Block C" />
                 </label>
                 <label>
                   Room number
                   <input
+                    name="room"
                     required
                     placeholder="07-42"
                     value={room}
@@ -61,12 +81,14 @@ export default function Register() {
                 <label>
                   Anything we should know?
                   <textarea
+                    name="notes"
                     rows={3}
                     placeholder="E.g. stocking is on the door handle, knock softly, roommate doesn't know yet…"
                   />
                 </label>
-                <button className="primary-button" type="submit">
-                  Register my stocking <span>↗</span>
+                {error && <p role="alert" style={{ color: "var(--red)" }}>{error}</p>}
+                <button className="primary-button" type="submit" disabled={sending}>
+                  {sending ? "Sending…" : "Register my stocking"} <span>↗</span>
                 </button>
               </form>
               <p className="register-footnote">

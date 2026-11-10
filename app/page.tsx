@@ -102,6 +102,8 @@ export default function Home() {
   const [activeDoor, setActiveDoor] = useState<number | null>(null);
   const [rsvpOpen, setRsvpOpen] = useState(false);
   const [submitted, setSubmitted] = useState(false);
+  const [rsvpSending, setRsvpSending] = useState(false);
+  const [rsvpError, setRsvpError] = useState("");
 
   const closeMenu = () => setMenuOpen(false);
 
@@ -305,11 +307,27 @@ export default function Home() {
                 <p className="section-kicker">The guest list</p>
                 <h3 id="rsvp-title">Save your seat.</h3>
                 <p>Friday, 18 December · 6:30 PM</p>
-                <form onSubmit={(e) => { e.preventDefault(); setSubmitted(true); }}>
-                  <label>Your name<input required placeholder="Clara Evergreen" /></label>
-                  <label>Email address<input required type="email" placeholder="clara@example.com" /></label>
-                  <label>Will you join us?<select defaultValue="yes"><option value="yes">Joyfully, yes!</option><option value="plus-one">Yes, with a guest</option><option value="no">Sorry to miss it</option></select></label>
-                  <button className="primary-button" type="submit">Send my reply <span>↗</span></button>
+                <form onSubmit={async (e) => {
+                  e.preventDefault();
+                  const data = Object.fromEntries(new FormData(e.currentTarget)) as Record<string, string>;
+                  setRsvpSending(true);
+                  setRsvpError("");
+                  try {
+                    const res = await fetch("/api/submit", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ kind: "rsvp", fields: data }) });
+                    const json = await res.json().catch(() => ({}));
+                    if (!res.ok || !json.ok) throw new Error(json.error || "Something went wrong");
+                    setSubmitted(true);
+                  } catch (err) {
+                    setRsvpError(err instanceof Error ? err.message : "Something went wrong");
+                  } finally {
+                    setRsvpSending(false);
+                  }
+                }}>
+                  <label>Your name<input name="name" required placeholder="Clara Evergreen" /></label>
+                  <label>Email address<input name="email" required type="email" placeholder="clara@example.com" /></label>
+                  <label>Will you join us?<select name="attending" defaultValue="yes"><option value="yes">Joyfully, yes!</option><option value="plus-one">Yes, with a guest</option><option value="no">Sorry to miss it</option></select></label>
+                  {rsvpError && <p role="alert" style={{ color: "var(--red)" }}>{rsvpError}</p>}
+                  <button className="primary-button" type="submit" disabled={rsvpSending}>{rsvpSending ? "Sending…" : "Send my reply"} <span>↗</span></button>
                 </form>
               </>
             ) : (
